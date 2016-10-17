@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ardic.mqtt</groupId>
+	<artifactId>LinuxWrapper</artifactId>
+	<version>0.0.1</version>
+	<name>MQTT Linux Wrapper</name>
+	<description>ArCloud Mqtt Sample Client for Linux</description>
+	<properties>
+		<slf4j.version>1.7.5</slf4j.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-configuration2</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ardic.mqtt.agent</groupId>
+			<artifactId>ContentAgent</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ardic.mqtt.agent</groupId>
+			<artifactId>SensorAgent</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ardic.mqtt</groupId>
+			<artifactId>MqttClientWrapper</artifactId>
+			<version>0.0.2</version>
+		</dependency>
+<dependency>
+    <groupId>commons-beanutils</groupId>
+    <artifactId>commons-beanutils</artifactId>
+    <version>1.9.3</version>
+</dependency>
+
+	</dependencies>
+
+</project>
