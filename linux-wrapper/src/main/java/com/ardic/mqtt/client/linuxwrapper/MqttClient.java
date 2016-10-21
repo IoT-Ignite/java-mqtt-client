@@ -5,40 +5,35 @@ import org.slf4j.LoggerFactory;
 
 import com.ardic.mqtt.agent.contentagent.ContentAgent;
 import com.ardic.mqtt.agent.sensoragent.SensorAgent;
-import com.ardic.mqtt.client.linuxwrapper.utils.ConfigurationLoader;
-import com.ardic.mqtt.client.model.AuthCredentials;
 import com.ardic.mqtt.client.service.SessionService;
 
 public class MqttClient {
 
 	private static Logger logger;
-	private static ConfigurationLoader configs;
 	static boolean connectionClose = false;
+
+	private MqttClient() {
+	}
 
 	public static void main(String[] args) throws InterruptedException {
 
 		logger = LoggerFactory.getLogger(MqttClient.class);
 
-		configs = ConfigurationLoader.getInstance(); 
+		SessionService session = SessionService.getInstance();
+		if (session.connect()) {
 
-		AuthCredentials credentials = InitializeAuthCredentials();
-		SessionService session = SessionService.initiateService(credentials);
-		session.connect();
+			initiateAgents();
 
-		initiateAgents();
-
-		while (!connectionClose) {
-			Thread.sleep(1000);
+			while (!connectionClose) {
+				Thread.sleep(1000);
+			}
+			session.disconnect();
+			System.exit(0);
+		}else {
+			logger.error("Connection is not initialized.");
+			System.exit(1);
 		}
-		session.disconnect();
-		System.exit(0);
 
-	}
-
-	private static AuthCredentials InitializeAuthCredentials() {
-
-		logger.debug("Initializing credentials: ClientId:[" + configs.MQTT_CLIENT_ID + "], Username:[" + configs.MQTT_USERNAME + "]");
-		return new AuthCredentials(configs.MQTT_CLIENT_ID, configs.MQTT_USERNAME, configs.MQTT_PASSWORD);
 	}
 
 	private static void initiateAgents() {
@@ -46,8 +41,7 @@ public class MqttClient {
 		ContentAgent.getInstance();
 		logger.info("Sensor Agent initiating...");
 		SensorAgent.getInstance();
-		
-		
+
 	}
 
 }

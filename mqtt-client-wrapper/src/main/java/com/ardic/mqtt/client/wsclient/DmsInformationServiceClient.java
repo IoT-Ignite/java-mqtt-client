@@ -3,11 +3,7 @@ package com.ardic.mqtt.client.wsclient;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URL;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPBody;
@@ -20,6 +16,7 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
@@ -57,15 +54,13 @@ public class DmsInformationServiceClient {
 			soapConnection.close();
 		} catch (SOAPException e2) {
 			logger.error("SOAPException", e2);
-		} catch (IOException e) {
-			logger.error("IOException", e);
 		} catch (Exception e) {
 			logger.error("Exception", e);
 		}
 		return new Dms(domain, port);
 	}
 
-	private static SOAPMessage createSOAPRequest(String deviceId) throws Exception {
+	private static SOAPMessage createSOAPRequest(String deviceId) throws SOAPException {
 		MessageFactory messageFactory = MessageFactory.newInstance();
 		SOAPMessage soapMessage = messageFactory.createMessage();
 		SOAPPart soapPart = soapMessage.getSOAPPart();
@@ -92,7 +87,7 @@ public class DmsInformationServiceClient {
 		return soapMessage;
 	}
 
-	private static String printSOAPResponse(SOAPMessage soapResponse) throws Exception {
+	private static String printSOAPResponse(SOAPMessage soapResponse) throws SOAPException, TransformerException {
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		Source sourceContent = soapResponse.getSOAPPart().getContent();

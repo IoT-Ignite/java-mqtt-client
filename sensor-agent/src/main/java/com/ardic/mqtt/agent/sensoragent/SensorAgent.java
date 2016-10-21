@@ -4,23 +4,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ardic.mqtt.agent.sensoragent.processor.TemperatureDataCollector;
-import com.ardic.mqtt.client.exception.ServiceNotAvailableException;
 import com.ardic.mqtt.client.service.MessagePublisherService;
+import com.google.gson.Gson;
 
 public class SensorAgent {
 
-	private static SensorAgent service = null;
-	Logger logger = LoggerFactory.getLogger(SensorAgent.class); 
-
-	public static SensorAgent getInstance() {
-		if (service == null) {
-			service = new SensorAgent();
-		}
-		return service;
-	}
+	private static SensorAgent service = new SensorAgent();
+	Logger logger = LoggerFactory.getLogger(SensorAgent.class);
 
 	private SensorAgent() {
 		initializeSensors();
+	}
+
+	public static SensorAgent getInstance() {
+		return service;
 	}
 
 	public void initializeSensors() {
@@ -32,15 +29,9 @@ public class SensorAgent {
 
 		// Publish deviceNodeInventory
 		MessagePublisherService publisher;
-		try {
-			publisher = MessagePublisherService.getInstance();
+		publisher = MessagePublisherService.getInstance();
+		publisher.publishMessage("DeviceProfile/Status/DeviceNodeInventory", new Gson().toJson(inventory.generateDeviceNodeInventory()));
 
-			publisher.publishMessage("DeviceProfile/Status/DeviceNodeInventory", inventory.generateDeviceNodeInventory().toString());
-
-		} catch (ServiceNotAvailableException e) {
-			logger.error("Message Publisher service is not initialized.", e);
-		}
-
-		temperature.run();
+		temperature.start();
 	}
 }

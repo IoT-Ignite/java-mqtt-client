@@ -7,81 +7,69 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ardic.mqtt.client.exception.ServiceNotAvailableException;
 import com.ardic.mqtt.client.model.AuthCredentials;
 import com.ardic.mqtt.client.model.Dms;
+import com.ardic.mqtt.client.util.ConfigurationLoader;
 import com.ardic.mqtt.client.wsclient.DmsInformationServiceClient;
 
 public class SessionService {
 
-	private static SessionService service;
-	private static MqttClient mqttClient;
-	private final String clientId;
-	private final String username;
-	private final char[] password;
+	private static SessionService service = new SessionService();
+	private MqttClient mqttClient;
+	private AuthCredentials credentials;
 
 	private Logger logger = LoggerFactory.getLogger(SessionService.class);
 
-	private SessionService(AuthCredentials credentials) {
-		clientId = credentials.getClientId();
-		username = credentials.getUsername();
-		password = credentials.getPassword();
+	private SessionService() {
+		credentials = ConfigurationLoader.getInstance().getCredentials();
 	}
 
-	public static synchronized SessionService getInstance() throws ServiceNotAvailableException {
-		if (service == null) {
-			throw new ServiceNotAvailableException();
-		}
+	public static SessionService getInstance() {
 		return service;
 	}
 
-	public static SessionService initiateService(AuthCredentials credentials){
-		service = new SessionService(credentials);
-		return service;
-	}
-
-	public void connect() {
+	public boolean connect() {
 
 		MemoryPersistence persistence = new MemoryPersistence();
 		DmsInformationServiceClient client = new DmsInformationServiceClient();
-		Dms dms = client.getAvailableDms(clientId);
+		Dms dms = client.getAvailableDms(credentials.getClientId());
 
 		String broker = "ssl://" + dms.getDomain() + ":" + dms.getPort();
 
 		try {
-			mqttClient = new MqttClient(broker, clientId, persistence);
-			CloudMessageService listener = CloudMessageService.initiateService(clientId);
+			mqttClient = new MqttClient(broker, credentials.getClientId(), persistence);
+			CloudMessageService listener = CloudMessageService.getInstance();
 			mqttClient.setCallback(listener);
 			MqttConnectOptions connOpts = new MqttConnectOptions();
-			connOpts.setPassword(password);
-			connOpts.setUserName(username);
+			connOpts.setPassword(credentials.getPassword());
+			connOpts.setUserName(credentials.getUsername());
 			connOpts.setCleanSession(false);
 			mqttClient.setTimeToWait(3000);
 			logger.info("Connecting to broker: " + broker);
 			mqttClient.connect(connOpts);
 
-			MessagePublisherService.initiateService(mqttClient);
+			MessagePublisherService.getInstance();
 
 		} catch (MqttException e) {
-			logger.error(e.getMessage());
+			logger.error("MqttException on connect",e);
 		}
 
+		return mqttClient.isConnected();
 	}
 
 	public void disconnect() {
 		try {
 			mqttClient.disconnect();
 		} catch (MqttException e) {
-			logger.error(e.getMessage());
+			logger.error("MqttException on disconnect",e);
 		}
 	}
 
-	public String getClientId(){
-		return clientId;
+	public MqttClient getMqttClient() {
+		return mqttClient;
 	}
 
-	public boolean isConnected(){
+	public boolean isConnected() {
 		return mqttClient.isConnected();
 	}
-
 }

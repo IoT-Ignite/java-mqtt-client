@@ -2,15 +2,15 @@ package com.ardic.mqtt.agent.contentagent.model;
 
 public class ContentPush {
 
-	String arg;
-	String destinationPath;
-	boolean isZippedContent;
-	String token;
-	String storageType;
-	String fileName;
-	String url;
-	String version;
-	String size;
+	private String arg;
+	private String destinationPath;
+	private boolean isZippedContent;
+	private String token;
+	private String storageType;
+	private String fileName;
+	private String url;
+	private String version;
+	private String size;
 
 	public String getArg() {
 		return arg;

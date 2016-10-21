@@ -4,8 +4,8 @@ import com.google.gson.JsonArray;
 
 public class CloudMessage {
 
-	MessageHeader header;
-	JsonArray body;
+	private MessageHeader header;
+	private JsonArray body;
 
 	public JsonArray getBody() {
 		return body;

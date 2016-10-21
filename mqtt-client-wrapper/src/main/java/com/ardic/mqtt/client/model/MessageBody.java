@@ -2,10 +2,10 @@ package com.ardic.mqtt.client.model;
 
 import com.google.gson.JsonArray;
 
-public class MessageBody<T> {
+public class MessageBody {
 
-	String type;
-	JsonArray params;
+	private String type;
+	private JsonArray params;
 
 	public JsonArray getParams() {
 		return params;

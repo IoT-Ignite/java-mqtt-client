@@ -10,43 +10,57 @@ import org.slf4j.LoggerFactory;
 
 import com.ardic.mqtt.agent.sensoragent.SensorInventory;
 import com.ardic.mqtt.agent.sensoragent.model.Sensor;
-import com.ardic.mqtt.client.exception.ServiceNotAvailableException;
+import com.ardic.mqtt.agent.sensoragent.model.SensorData;
+import com.ardic.mqtt.agent.sensoragent.model.SensorDataPackage;
+import com.ardic.mqtt.agent.sensoragent.model.SensorDataValue;
 import com.ardic.mqtt.client.service.MessagePublisherService;
+import com.google.gson.Gson;
 
 public class TemperatureDataCollector implements Runnable {
 
-	BufferedReader br = null;
 	FileReader fr = null;
 	private MessagePublisherService publisher;
 	private Logger logger = LoggerFactory.getLogger(TemperatureDataCollector.class);
 	private static final Sensor TEMPERATURE_SENSOR = new Sensor("CpuTemp", "INTEGER", "ARDIC", false, "Temperature");
+	private boolean readData = true;
 
 	public TemperatureDataCollector() {
-		try {
-			publisher = MessagePublisherService.getInstance();
-			SensorInventory.getInstance().addSensor(TEMPERATURE_SENSOR);
-		} catch (ServiceNotAvailableException e) {
-			logger.error("MessagePublishService is not initialized.", e);
-		}
+		publisher = MessagePublisherService.getInstance();
+		SensorInventory.getInstance().addSensor(TEMPERATURE_SENSOR);
 	}
 
 	public void run() {
-		while (true) {
-			try {
-				fr = new FileReader("/sys/class/thermal/thermal_zone2/temp");
-				br = new BufferedReader(fr);
-				String data = "{\"data\":{\"sensorData\": [{\"date\":" + new Date().getTime() + ",\"values\":[\"" + br.readLine() + "\"]}]}}";
-				publisher.publishMessage("DeviceProfile/Built-in Sensors/" + TEMPERATURE_SENSOR.getId(), data);
+		while (readData) {
+			try (BufferedReader br = new BufferedReader(new FileReader("/sys/class/thermal/thermal_zone2/temp"));) {
+				String[] value = new String[1];
+				value[0] = br.readLine();
+				SensorDataValue<String>[] sensorValue = new SensorDataValue[1];
+				sensorValue[0] = new SensorDataValue<String>(new Date().getTime(), value);
+
+				SensorDataPackage<String> dataPackage = new SensorDataPackage<String>();
+				dataPackage.setSensorData(sensorValue);
+				SensorData<String> data = new SensorData<String>();
+				data.setData(dataPackage);
+				publisher.publishMessage("DeviceProfile/Built-in Sensors/" + TEMPERATURE_SENSOR.getId(), new Gson().toJson(data));
 				br.close();
 			} catch (IOException e) {
 				logger.error("IOException", e);
+				readData = false;
 			}
 			try {
 				Thread.sleep(30000);
 			} catch (InterruptedException e) {
 				logger.error("Thread sleep interruptException:", e);
+				Thread.currentThread().interrupt();
 			}
 		}
 
+	}
+
+	/**
+	 * Stop reading temperature data.
+	 */
+	public void stopReading() {
+		readData = false;
 	}
 }

@@ -2,8 +2,8 @@ package com.ardic.mqtt.client.model;
 
 public class MessageHeader {
 
-	String msgId;
-	long maxMessageSize;
+	private String msgId;
+	private long maxMessageSize;
 
 	public String getMsgId() {
 		return msgId;

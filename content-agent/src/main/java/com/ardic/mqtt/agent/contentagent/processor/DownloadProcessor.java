@@ -1,5 +1,6 @@
 package com.ardic.mqtt.agent.contentagent.processor;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +20,7 @@ public class DownloadProcessor {
 	private String fileName;
 	private String token;
 	private String destination;
+	private String errorMessage;
 	private Logger logger = LoggerFactory.getLogger(DownloadProcessor.class);
 
 	public DownloadProcessor(ContentPush content) {
@@ -33,25 +35,37 @@ public class DownloadProcessor {
 	}
 
 	public boolean process() {
-		try {
-			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-			conn.setRequestProperty("X-Auth-Token", token);
-			InputStream stream = conn.getInputStream();
-			// opens an output stream to save into file
-			FileOutputStream outputStream = new FileOutputStream(destination + "/" + fileName);
 
+		HttpsURLConnection conn = null;
+		try {
+			conn = (HttpsURLConnection) url.openConnection();
+		} catch (IOException e1) {
+			logger.error("Cannot open HTTPS connection.", e1);
+			return false;
+		}
+
+		conn.setRequestProperty("X-Auth-Token", token);
+		try (FileOutputStream outputStream = new FileOutputStream(destination + "/" + fileName); InputStream stream = conn.getInputStream()) {
 			int bytesRead = -1;
 			byte[] buffer = new byte[conn.getContentLength()];
 			while ((bytesRead = stream.read(buffer)) != -1) {
 				outputStream.write(buffer, 0, bytesRead);
 			}
-			outputStream.close();
 
+		} catch (FileNotFoundException e) {
+			errorMessage = "Cannot open destination file"+ destination + "/" + fileName + "for writing.";
+			logger.error(errorMessage,e);
+			return false;
 		} catch (IOException e) {
-			logger.error("File IO error: ", e);
+			errorMessage = "IOError";
+			logger.error(errorMessage,e);
 			return false;
 		}
 
 		return true;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
 	}
 }

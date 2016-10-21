@@ -7,38 +7,34 @@ import java.util.Map;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ardic.mqtt.client.exception.ServiceNotAvailableException;
 import com.ardic.mqtt.client.listener.CloudMessageListener;
+import com.ardic.mqtt.client.model.AgentMessage;
+import com.ardic.mqtt.client.model.CloudMessage;
+import com.ardic.mqtt.client.util.ConfigurationLoader;
 import com.ardic.mqtt.client.util.Constants;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 public class CloudMessageService implements MqttCallback {
 
-	private static CloudMessageService service = null;
+	private static CloudMessageService service = new CloudMessageService();
 	private Logger logger = LoggerFactory.getLogger(CloudMessageService.class);
 	private Map<CloudMessageListener, List<String>> agentList;
 	private Map<CloudMessageListener, List<String>> responseListenersList;
 	private String clientId;
 
-	private CloudMessageService(String clientId) {
+	private CloudMessageService() {
 		agentList = new HashMap<CloudMessageListener, List<String>>();
 		responseListenersList = new HashMap<CloudMessageListener, List<String>>();
-		this.clientId = clientId;
+		ConfigurationLoader configs = ConfigurationLoader.getInstance();
+		this.clientId = configs.getCredentials().getClientId();
 
 	}
 
-	public static CloudMessageService initiateService(String clientId) {
-		service = new CloudMessageService(clientId);
-		return service;
-	}
-
-	public static CloudMessageService getInstance() throws ServiceNotAvailableException {
-		if (service == null) {
-			throw new ServiceNotAvailableException();
-		}
+	public static CloudMessageService getInstance() {
 		return service;
 	}
 
@@ -55,10 +51,9 @@ public class CloudMessageService implements MqttCallback {
 				waitTime *= 1.2;
 				attempt++;
 			} while (!SessionService.getInstance().isConnected());
-		} catch (ServiceNotAvailableException e) {
-			logger.error("SessionService is not available, terminating...", e);
 		} catch (InterruptedException e) {
 			logger.error("Thread exception, terminating...", e);
+			Thread.currentThread().interrupt();
 		}
 	}
 
@@ -68,17 +63,16 @@ public class CloudMessageService implements MqttCallback {
 
 		String shortTopic = topic.replace(clientId + "/subscribe/", "");
 
-		JSONObject cloudMessage = new JSONObject(new String(message.getPayload()));
-		logger.info("shortTopic: " + shortTopic);
+		CloudMessage cloudMessage = new Gson().fromJson(new String(message.getPayload()), CloudMessage.class);
 
 		if (shortTopic.equals(Constants.TOPIC_QUEUE)) {
-			String messageType = ((JSONObject) (cloudMessage.getJSONArray("body").get(0))).getString("type");
-			String messageId = ((JSONObject) (cloudMessage.getJSONObject("header"))).getString("msgId");
-			logger.info("message Type: " + messageType);
+			String messageType = ((JsonObject) cloudMessage.getBody().get(0)).get("type").getAsString();
+			String messageId = cloudMessage.getHeader().getMsgId();
+
 			boolean messageSent = false;
 			for (Map.Entry<CloudMessageListener, List<String>> listener : agentList.entrySet()) {
 				if (listener.getValue().contains(messageType)) {
-					listener.getKey().onCloudMessageReceive(new String(message.getPayload()));
+					listener.getKey().onCloudMessageReceive(simplifyMessage(cloudMessage));
 					messageSent = true;
 				}
 			}
@@ -88,11 +82,18 @@ public class CloudMessageService implements MqttCallback {
 		} else {
 			for (Map.Entry<CloudMessageListener, List<String>> listener : responseListenersList.entrySet()) {
 				if (listener.getValue().contains(shortTopic)) {
-					listener.getKey().onCloudMessageReceive(new String(message.getPayload()));
+					listener.getKey().onCloudMessageReceive(simplifyMessage(cloudMessage));
 				}
 			}
 		}
 
+	}
+
+	private AgentMessage simplifyMessage(CloudMessage cloudMessage){
+		AgentMessage agentMessage = new AgentMessage();
+		agentMessage.setBody((JsonObject) cloudMessage.getBody().get(0));
+		agentMessage.setMsgId(cloudMessage.getHeader().getMsgId());
+		return agentMessage;
 	}
 
 	public void deliveryComplete(IMqttDeliveryToken token) {
