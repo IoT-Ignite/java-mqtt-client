@@ -12,6 +12,7 @@
 		<module>mqtt-client-wrapper</module>
 		<module>content-agent</module>
 		<module>sensor-agent</module>
+		<module>os-profile-agent</module>
 		<module>linux-wrapper</module>
 	</modules>
 

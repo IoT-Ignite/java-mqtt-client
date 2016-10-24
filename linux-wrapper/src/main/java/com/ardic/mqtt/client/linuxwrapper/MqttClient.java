@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ardic.mqtt.agent.contentagent.ContentAgent;
+import com.ardic.mqtt.agent.osprofileagent.OSProfileAgent;
 import com.ardic.mqtt.agent.sensoragent.SensorAgent;
 import com.ardic.mqtt.client.service.SessionService;
 
@@ -37,6 +38,8 @@ public class MqttClient {
 	}
 
 	private static void initiateAgents() {
+		logger.info("OS Profile Agent initiating...");
+		OSProfileAgent.getInstance();
 		logger.info("Content Agent initiating...");
 		ContentAgent.getInstance();
 		logger.info("Sensor Agent initiating...");
