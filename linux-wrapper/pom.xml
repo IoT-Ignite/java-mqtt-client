@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ardic.mqtt</groupId>
 	<artifactId>linux-wrapper</artifactId>
-	<version>0.0.1</version>
+	<version>1.0.0</version>
 	<name>MQTT Linux Wrapper</name>
 	<description>ArCloud Mqtt Sample Client for Linux</description>
 	<properties>
@@ -76,22 +76,22 @@
 		<dependency>
 			<groupId>com.ardic.mqtt.agent</groupId>
 			<artifactId>content-agent</artifactId>
-			<version>0.0.1</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ardic.mqtt.agent</groupId>
 			<artifactId>sensor-agent</artifactId>
-			<version>0.0.1</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ardic.mqtt.agent</groupId>
 			<artifactId>os-profile-agent</artifactId>
-			<version>0.0.1</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ardic.mqtt</groupId>
 			<artifactId>mqtt-client-wrapper</artifactId>
-			<version>0.0.2</version>
+			<version>1.0.0</version>
 		</dependency>
 
 	</dependencies>

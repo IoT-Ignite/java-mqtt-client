@@ -21,9 +21,7 @@ public class OSProfileAgent implements CloudMessageListener {
 	Logger logger = LoggerFactory.getLogger(OSProfileAgent.class);
 
 	private OSProfileAgent() {
-		CloudMessageService cloudMessageService;
-
-		cloudMessageService = CloudMessageService.getInstance();
+		CloudMessageService cloudMessageService = CloudMessageService.getInstance();
 		List<String> serviceList = new ArrayList<String>();
 		serviceList.add("PUSH_CMD_GET_CURRENT_STATUS");
 		cloudMessageService.addListener(this, serviceList);

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ardic.mqtt</groupId>
 	<artifactId>mqtt-client-wrapper</artifactId>
-	<version>0.0.2</version>
+	<version>1.0.0</version>
 	<name>MqttClientWrapper</name>
 	<description>ArCloud Mqtt Client Wrapper</description>
 	<properties>

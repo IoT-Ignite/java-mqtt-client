@@ -15,7 +15,8 @@ public class OSProfileCollector {
 
 	public OSProfile getOSProfile(){
 		OSProfile profile = new OSProfile();
-		profile.setAfexMode("Light Gateway");
+		profile.setAfexMode("LightGateway");
+		profile.setModel(System.getProperty("os.name"));
 		profile.setDevice(System.getProperty("os.name") + " " + System.getProperty("os.arch"));
 		profile.setOsName(System.getProperty("os.name"));
 		profile.setOsVersion(System.getProperty("os.version"));

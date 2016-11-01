@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ardic.mqtt.agent</groupId>
 	<artifactId>sensor-agent</artifactId>
-	<version>0.0.1</version>
+	<version>1.0.0</version>
 	<name>MQTT Sensor Agent</name>
 	<description>ArCloud Mqtt Agent Samples - MQTT Sensor Agent</description>
 	<properties>
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>com.ardic.mqtt</groupId>
 			<artifactId>mqtt-client-wrapper</artifactId>
-			<version>0.0.2</version>
+			<version>1.0.0</version>
 		</dependency>
 	</dependencies>
 </project>
