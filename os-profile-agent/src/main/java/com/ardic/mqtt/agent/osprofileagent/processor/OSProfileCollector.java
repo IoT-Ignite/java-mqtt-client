@@ -21,12 +21,13 @@ public class OSProfileCollector {
 		profile.setOsName(System.getProperty("os.name"));
 		profile.setOsVersion(System.getProperty("os.version"));
 		profile.setDeviceId(SessionService.getInstance().getMqttClient().getClientId());
-		try {
-			profile.setLocalIp(Inet4Address.getLocalHost().getHostAddress());
-			profile.setHost(Inet4Address.getLocalHost().getHostName());
-		} catch (UnknownHostException e) {
-			logger.error("Cannot get Local IP Address",e);
-		}
+//		TODO: This method is not returning true local IP address of connection. MQTT client IP address shoud be get.
+//		try {
+//			profile.setLocalIp(Inet4Address.getLocalHost().getHostAddress());
+//			profile.setHost(Inet4Address.getLocalHost().getHostName());
+//		} catch (UnknownHostException e) {
+//			logger.error("Cannot get Local IP Address",e);
+//		}
 		
 		return profile;
 	}
