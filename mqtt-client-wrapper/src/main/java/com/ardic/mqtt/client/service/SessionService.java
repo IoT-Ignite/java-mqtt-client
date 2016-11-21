@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.ardic.mqtt.client.model.AuthCredentials;
 import com.ardic.mqtt.client.model.Dms;
 import com.ardic.mqtt.client.util.ConfigurationLoader;
-import com.ardic.mqtt.client.wsclient.DmsInformationServiceClient;
 
 public class SessionService {
 
@@ -19,6 +18,8 @@ public class SessionService {
 	private AuthCredentials credentials;
 
 	private Logger logger = LoggerFactory.getLogger(SessionService.class);
+
+	private final Dms dms = new Dms("mqtt.ardich.com", 8883);
 
 	private SessionService() {
 		credentials = ConfigurationLoader.getInstance().getCredentials();
@@ -31,8 +32,6 @@ public class SessionService {
 	public boolean connect() {
 
 		MemoryPersistence persistence = new MemoryPersistence();
-		DmsInformationServiceClient client = new DmsInformationServiceClient();
-		Dms dms = client.getAvailableDms(credentials.getClientId());
 
 		String broker = "ssl://" + dms.getDomain() + ":" + dms.getPort();
 
@@ -51,7 +50,7 @@ public class SessionService {
 			MessagePublisherService.getInstance();
 
 		} catch (MqttException e) {
-			logger.error("MqttException on connect",e);
+			logger.error("MqttException on connect", e);
 		}
 
 		return mqttClient.isConnected();
@@ -61,7 +60,7 @@ public class SessionService {
 		try {
 			mqttClient.disconnect();
 		} catch (MqttException e) {
-			logger.error("MqttException on disconnect",e);
+			logger.error("MqttException on disconnect", e);
 		}
 	}
 
