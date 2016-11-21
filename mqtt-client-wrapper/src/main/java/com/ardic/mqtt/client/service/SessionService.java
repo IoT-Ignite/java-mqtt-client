@@ -20,30 +20,34 @@ public class SessionService {
 	private Logger logger = LoggerFactory.getLogger(SessionService.class);
 
 	private final Dms dms = new Dms("mqtt.ardich.com", 8883);
+	private String broker = "ssl://" + dms.getDomain() + ":" + dms.getPort();
+	private MqttConnectOptions connOpts; 
 
 	private SessionService() {
+		
+		MemoryPersistence persistence = new MemoryPersistence();
 		credentials = ConfigurationLoader.getInstance().getCredentials();
+		try {
+			mqttClient = new MqttClient(broker, credentials.getClientId(), persistence);
+			CloudMessageService listener = CloudMessageService.getInstance();
+			mqttClient.setCallback(listener);
+			connOpts = new MqttConnectOptions();
+			connOpts.setPassword(credentials.getPassword());
+			connOpts.setUserName(credentials.getUsername());
+			connOpts.setCleanSession(false);
+			mqttClient.setTimeToWait(3000);
+		} catch (MqttException e) {
+			logger.error("MqttException on connect", e);
+		}
 	}
 
 	public static SessionService getInstance() {
 		return service;
 	}
 
-	public boolean connect() {
-
-		MemoryPersistence persistence = new MemoryPersistence();
-
-		String broker = "ssl://" + dms.getDomain() + ":" + dms.getPort();
+	public synchronized boolean connect() {
 
 		try {
-			mqttClient = new MqttClient(broker, credentials.getClientId(), persistence);
-			CloudMessageService listener = CloudMessageService.getInstance();
-			mqttClient.setCallback(listener);
-			MqttConnectOptions connOpts = new MqttConnectOptions();
-			connOpts.setPassword(credentials.getPassword());
-			connOpts.setUserName(credentials.getUsername());
-			connOpts.setCleanSession(false);
-			mqttClient.setTimeToWait(3000);
 			logger.info("Connecting to broker: " + broker);
 			mqttClient.connect(connOpts);
 
@@ -68,7 +72,7 @@ public class SessionService {
 		return mqttClient;
 	}
 
-	public boolean isConnected() {
+	public synchronized boolean isConnected() {
 		return mqttClient.isConnected();
 	}
 }
