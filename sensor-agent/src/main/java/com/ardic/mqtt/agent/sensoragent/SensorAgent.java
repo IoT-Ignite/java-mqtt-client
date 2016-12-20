@@ -24,6 +24,9 @@ public class SensorAgent {
 
 		SensorInventory inventory = SensorInventory.getInstance();
 
+		//Add built-in sensor node
+		inventory.addNode("Built-in Sensors", "Root Node");
+
 		// Create sensor collectors
 		Thread temperature = new Thread(new TemperatureDataCollector());
 
@@ -31,7 +34,8 @@ public class SensorAgent {
 		MessagePublisherService publisher;
 		publisher = MessagePublisherService.getInstance();
 		publisher.publishMessage("DeviceProfile/Status/DeviceNodeInventory", new Gson().toJson(inventory.generateDeviceNodeInventory()));
-
 		temperature.start();
+		
+		publisher.publishMessage("DeviceProfile/Status/DeviceNodePresence", new Gson().toJson(inventory.generateDeviceNodePresence()));
 	}
 }

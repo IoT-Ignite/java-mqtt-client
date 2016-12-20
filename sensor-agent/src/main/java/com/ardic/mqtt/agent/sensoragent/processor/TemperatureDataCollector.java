@@ -26,10 +26,11 @@ public class TemperatureDataCollector implements Runnable {
 
 	public TemperatureDataCollector() {
 		publisher = MessagePublisherService.getInstance();
-		SensorInventory.getInstance().addSensor(TEMPERATURE_SENSOR);
+		SensorInventory.getInstance().addSensor("Built-in Sensors", TEMPERATURE_SENSOR);
 	}
 
 	public void run() {
+		SensorInventory.getInstance().sensorConnectionStatus(TEMPERATURE_SENSOR.getId(), 1);
 		while (readData) {
 			try (BufferedReader br = new BufferedReader(new FileReader("/sys/class/thermal/thermal_zone2/temp"));) {
 				String[] value = new String[1];

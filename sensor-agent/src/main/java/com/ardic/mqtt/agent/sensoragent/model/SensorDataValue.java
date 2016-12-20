@@ -3,11 +3,11 @@ package com.ardic.mqtt.agent.sensoragent.model;
 public class SensorDataValue<T> {
 
 	private long date;
-	private T[] value;
+	private T[] values;
 
-	public SensorDataValue(long time, T[] value) {
+	public SensorDataValue(long time, T[] values) {
 		this.date = time;
-		this.value = value;
+		this.values = values;
 	}
 
 	public long getDate() {
@@ -19,10 +19,10 @@ public class SensorDataValue<T> {
 	}
 
 	public T[] getValue() {
-		return value;
+		return values;
 	}
 
-	public void setValue(T[] value) {
-		this.value = value;
+	public void setValue(T[] values) {
+		this.values = values;
 	}
 }
