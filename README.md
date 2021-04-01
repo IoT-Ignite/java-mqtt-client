@@ -26,6 +26,4 @@ Configuration file should be given as parameter when starting MQTT-Client.
 $ java -Dmqtt.properties="./mqtt.configurations" -jar linux-wrapper-1.0.0-jar-with-dependencies.jar
 ```
 
-<b>Note:</b> This application requires adding devices manually into the system for the MQTT Client.
-
 For more information about MQTT Client please visit [Devzone documentation](https://devzone.iot-ignite.com/knowledge-base/using-iot-ignite-mqtt-client/)
