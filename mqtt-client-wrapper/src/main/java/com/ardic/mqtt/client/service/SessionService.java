@@ -19,7 +19,7 @@ public class SessionService {
 
 	private Logger logger = LoggerFactory.getLogger(SessionService.class);
 
-	private final Dms dms = new Dms("mqtt-tr.ardich.com", 8883);
+	private final Dms dms = new Dms("mqtt-tr.iot-ignite.com", 8883);
 	private String broker = "ssl://" + dms.getDomain() + ":" + dms.getPort();
 	private MqttConnectOptions connOpts; 
 
